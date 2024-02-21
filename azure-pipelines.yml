@@ -8,10 +8,14 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
+  
+variables:
+  minhaVariavel: 'TESTVARIABLE'  
 
 steps:
-- script: echo Hello, world! | cat $(TESTVARIABLE)
-  displayName: 'Run a one-line script'
+- script: |
+    sed -i "2s/.*/<html><head><title>$(TESTVARIABLE)<\/title><\/head><body><\/body><\/html>/" $(Build.SourcesDirectory)/index.html
+  displayName: 'Add variable on index.html'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
