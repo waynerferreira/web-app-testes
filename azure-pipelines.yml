@@ -14,7 +14,7 @@ variables:
 
 steps:
 - script: |
-    sed -i "2s/.*/<html><head><title>$(TESTVARIABLE)<\/title><\/head><body><\/body><\/html>/" $(Build.SourcesDirectory)/index.html
+    sed -i "2s|.*|<html><head><title>Título<\/title><\/head><body><h1>$(TESTVARIABLE)<\/h1><\/body><\/html>|" $(Build.SourcesDirectory)/index.html
   displayName: 'Add variable on index.html'
 
 - script: |
