@@ -10,11 +10,11 @@ pool:
   vmImage: ubuntu-latest
   
 variables:
-  minhaVariavel: 'TESTVARIABLE'  
+  TESTVARIABLE: 'TESTVARIABLE'  
 
 steps:
 - script: |
-    sed -i "2s|.*|<html><head><title>Título<\/title><\/head><body><h1>$(TESTVARIABLE)<\/h1><\/body><\/html>|" $(Build.SourcesDirectory)/index.html
+    sed -i "2s|.*|<html><head><title>Título<\/title><\/head><body><h1>$(TESTVARIABLE)<\/h1><\/body><\/html>|" ./index.html
   displayName: 'Add variable on index.html'
 
 - script: |
