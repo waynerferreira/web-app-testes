@@ -15,16 +15,12 @@ variables:
 
 steps:
 - script: |
-    curl -sSL "https://raw.githubusercontent.com/wayner-ferreira/web-app-testes/main/index.html" -o index.html
-    sed -i "2s|.*|<html><head><title>Título</title></head><body><h1>$(testvariable)</h1></body></html>|" index.html
-    curl -u $(GITHUB_TOKEN):x-oauth-basic -X PUT -d @index.html "https://api.github.com/repos/seu-usuario/seu-repositorio/contents/index.html"
+    curl -sSL "https://raw.githubusercontent.com/waynerferreira/web-app-testes/main/index.html" -o index.html
+    sed -i "2s|.*|<html><head><title>Título</title></head><body><h1>$(TESTVARIABLE)</h1></body></html>|" index.html
+    curl -u $(GITHUB_TOKEN):x-oauth-basic -X PUT -d @index.html "https://api.github.com/repos/waynerferreira/web-app-testes/contents/index.html"
   displayName: 'Atualizar Valor em index.html'
   env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    GITHUB_TOKEN: $(GITHUB_TOKEN)
 
 - task: PublishBuildArtifacts@1
   inputs:
