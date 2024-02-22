@@ -1,29 +1,50 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
-  
-variables:
-  TESTVARIABLE: $(testvariable)
-  GITHUB_TOKEN: $(githubtoken)
+pr:
+- '*'
 
-steps:
-- script: |
-    curl -sSL "https://raw.githubusercontent.com/waynerferreira/web-app-testes/main/index.html" -o index.html
-    sed -i "2s|.*|<html><head><title>Título</title></head><body><h1>$(TESTVARIABLE)</h1></body></html>|" index.html
-    curl -u $(GITHUB_TOKEN):x-oauth-basic -X PUT -d @index.html "https://api.github.com/repos/waynerferreira/web-app-testes/contents/index.html"
-  displayName: 'Atualizar Valor em index.html'
-  env:
-    GITHUB_TOKEN: $(GITHUB_TOKEN)
+jobs:
+- job: build_and_deploy
+  pool:
+    vmImage: 'ubuntu-latest'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '.'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+  steps:
+  - checkout: self
+
+  - script: |
+      # Construir a imagem Docker
+      docker build -t meu-nginx:latest .
+
+      # Logar no registro de contêiner do Azure, se necessário
+      docker login -u acrwayner -p $(acrwaynerpass) acrwayner.azurecr.io
+
+      # Subir a imagem para o registro de contêiner do Azure, se necessário
+      docker push acrwayner.azurecr.io/meu-nginx:latest
+    displayName: 'Construir e empurrar imagem Docker'
+
+  - task: DockerCompose@0
+    inputs:
+      containerregistrytype: acrwayner
+      dockerRegistryEndpoint: acrwayner.azurecr.io
+      action: 'Run a Docker Compose command'
+      dockerComposeCommand: 'up'
+      dockerComposeFile: '**/docker-compose.yml'
+    displayName: 'Executar contêiner Docker Compose'
+
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Aguarde alguns segundos para garantir que o contêiner tenha iniciado
+        Start-Sleep -Seconds 10
+        
+        # Testar a aplicação
+        $response = Invoke-RestMethod -Uri 'http://localhost:8080' -Method Get
+        if ($response -eq 'SeuTextoEsperado') {
+          Write-Host 'Teste bem-sucedido!'
+        } else {
+          Write-Host 'Teste falhou!'
+          exit 1
+        }
+    displayName: 'Testar a aplicação'
