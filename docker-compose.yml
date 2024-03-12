@@ -2,7 +2,7 @@ version: '3'
 
 services:
   meu-nginx:
-    image: meu-nginx:latest
+    image: meu-nginxwayner:latest
     ports:
       - "8080:80"
     volumes:
