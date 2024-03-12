@@ -4,47 +4,13 @@ trigger:
 pr:
 - '*'
 
-jobs:
-- job: build_and_deploy
-  pool:
-    vmImage: 'ubuntu-latest'
-
-  steps:
-  - checkout: self
-
-  - script: |
-      # Construir a imagem Docker
-      docker build -t meu-nginxwayner:latest .
-
-      # Logar no registro de contêiner do Azure, se necessário
-      docker login -u acrwayner -p $(acrwaynerpass) acrwayner.azurecr.io
-
-      # Subir a imagem para o registro de contêiner do Azure, se necessário
-      docker push acrwayner.azurecr.io/meu-nginx:latest
-    displayName: 'Construir e empurrar imagem Docker'
-
-  - task: DockerCompose@0
-    inputs:
-      containerregistrytype: acrwayner
-      dockerRegistryEndpoint: acrwayner.azurecr.io
-      action: 'Run a Docker Compose command'
-      dockerComposeCommand: 'up'
-      dockerComposeFile: '**/docker-compose.yml'
-    displayName: 'Executar contêiner Docker Compose'
-
-  - task: PowerShell@2
-    inputs:
-      targetType: 'inline'
-      script: |
-        # Aguarde alguns segundos para garantir que o contêiner tenha iniciado
-        Start-Sleep -Seconds 10
-        
-        # Testar a aplicação
-        $response = Invoke-RestMethod -Uri 'http://localhost:8080' -Method Get
-        if ($response -eq 'SeuTextoEsperado') {
-          Write-Host 'Teste bem-sucedido!'
-        } else {
-          Write-Host 'Teste falhou!'
-          exit 1
-        }
-    displayName: 'Testar a aplicação'
+steps:
+- task: DockerCompose@0
+  displayName: 'Execute Docker Compose up'
+  inputs:
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: 'Azure for Students(b644be36-9223-42a4-8a5d-a326f8e0af33)'
+    azureContainerRegistry: '{"loginServer":"acrwayner.azurecr.io", "id" : "/subscriptions/b644be36-9223-42a4-8a5d-a326f8e0af33/resourceGroups/rg-testes-wayner/providers/Microsoft.ContainerRegistry/registries/acrwayner"}'
+    dockerComposeFile: '**/docker-compose.yml'
+    action: 'Run a Docker Compose command'
+    dockerComposeCommand: 'up'
