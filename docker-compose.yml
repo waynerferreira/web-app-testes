@@ -2,7 +2,9 @@ version: '3'
 
 services:
   meu-nginx:
-    image: meu-nginxwayner:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8080:80"
     volumes:

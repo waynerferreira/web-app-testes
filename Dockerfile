@@ -5,7 +5,7 @@ FROM nginx:latest
 COPY index.html /usr/share/nginx/html
 
 # Exponha a porta 8080
-EXPOSE 8080
+EXPOSE 80
 
 # Comando para iniciar o Nginx em primeiro plano quando o contêiner for iniciado
 CMD ["nginx", "-g", "daemon off;"]
