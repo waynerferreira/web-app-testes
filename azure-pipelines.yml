@@ -5,7 +5,7 @@ pr:
 - '*'
 
 variables:
-  dockerRegistryServiceConnection: 'b644be36-9223-42a4-8a5d-a326f8e0af33'
+  dockerRegistryServiceConnection: '{"loginServer":"acrwayner.azurecr.io", "id" : "/subscriptions/b644be36-9223-42a4-8a5d-a326f8e0af33/resourceGroups/rg-testes-wayner/providers/Microsoft.ContainerRegistry/registries/acrwayner"}'
   imageRepository: 'acrwayner'
   azureContainerRegistry: 'acrwayner.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/WEB-APP-TESTES/Dockerfile'
